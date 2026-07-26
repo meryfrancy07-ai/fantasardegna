@@ -227,13 +227,21 @@ with tab4:
                     "Persona": persona_selezionata,
                     "Azione": azione_selezionata,
                     "Punti": punti_assegnati
-                    }
+                }
         
-                url_script = "https://script.google.com/macros/s/AKfycbxLvD8XiFrv737eR_YSJRpE7LZvDfVlRn5mg6zuNCnbQS66oEGdEFM30weXqP7uVJ2Z/exec"
+                url_script = "https://script.google.com/macros/s/AKfycbw9uencR84EQyk1sgH68rdq5SsoL_BA4k4_va1dHdf2ZrCEWRvjfK2oILrzpeeXmmlQmg/exec"
         
                 try:
                     risposta = requests.post(url_script, json=nuovo_dato)
                     if risposta.status_code == 200:
+                        nuovo_evento_df = pd.DataFrame({
+                            "Data": [data_evento.strftime("%d/%m/%Y")],
+                            "Persona": [persona_selezionata],
+                            "Azione": [azione_selezionata],
+                            "Punti": [punti_assegnati]
+                            })
+                        st.session_state.eventi = pd.concat([st.session_state.eventi, nuovo_evento_df], ignore_index=True)
+                        
                         st.success(f"Aggiunto e salvato sul Cloud! {persona_selezionata} ha preso {punti_assegnati} punti.")
                     else:
                         st.warning("C'è stato un problema nel salvataggio sul cloud.")
