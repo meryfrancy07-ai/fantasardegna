@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Sun Jul 26 20:40:43 2026
+
+@author: maria
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Sun Jul 26 17:21:10 2026
 
 @author: maria
@@ -8,11 +15,11 @@ Created on Sun Jul 26 17:21:10 2026
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-import os # Ci serve per dire al programma di cercare i file delle foto
+import os 
 import requests
 
-# Link per leggere i dati dal Foglio Google
-url_foglio = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS-DeqH_4J8v8Tx74q4i5FIlHbkJbf1Lu3HaHRoEswTlFs7r56B-L0d3TvP1xTWbXKMMR5INSqr2k26/pub?output=csv"
+# Link diretto per leggere i dati dal Foglio Google (senza ritardi di cache)
+url_foglio = "https://docs.google.com/spreadsheets/d/1OM4wMHXeal2kTsORf6GhZCsKHP-cfJJ1zdQFWdu1Kpg/export?format=csv"
 
 try:
     st.session_state.eventi = pd.read_csv(url_foglio)
@@ -128,7 +135,6 @@ with tab1:
         persona_corrente = row['Persona']
         punti_correnti = row['Punti Totali']
         
-        # Creiamo un blocco a comparsa (expander) per ogni giocatore
         with st.expander(f"👤 {persona_corrente} - Punti: {punti_correnti}"):
             col1, col2 = st.columns([1, 2])
             
@@ -136,39 +142,36 @@ with tab1:
                 cartella_foto = "foto_giocatori"
                 foto_trovata = False
                 
-                # Controllo se la cartella esiste ed è nel posto giusto
                 if os.path.exists(cartella_foto):
-                    # Guarda tutti i file dentro la cartella
                     for file in os.listdir(cartella_foto):
-                        # Se il nome del file (togliendo l'estensione) è uguale al nome del giocatore...
                         if file.split('.')[0].lower() == persona_corrente.lower():
                             st.image(f"{cartella_foto}/{file}", use_column_width=True)
                             foto_trovata = True
-                            break # Trovata! Si ferma.
+                            break 
                 else:
                     st.error("Non trovo la cartella 'foto_giocatori' accanto ad app.py!")
-                    foto_trovata = True # Per nascondere l'altro avviso
+                    foto_trovata = True 
                 
                 if not foto_trovata:
                     st.warning(f"Manca la foto di {persona_corrente}.")
             
             with col2:
                 st.write(f"**Punti Attuali:** {punti_correnti}")
-                # Mostra la lista degli eventi solo di questo specifico giocatore
                 eventi_personali = st.session_state.eventi[st.session_state.eventi['Persona'] == persona_corrente]
                 if not eventi_personali.empty:
                     st.write("**Storico Azioni:**")
                     st.dataframe(eventi_personali[['Data', 'Azione', 'Punti']], hide_index=True)
                 else:
                     st.write("Nessuna azione registrata finora.")
+
+# --- TAB 2: REGOLAMENTO ---
 with tab2:
     st.header("Le Regole del Gioco")
-    
     st.markdown("""
-    L'obiettivo principale è divertirsi, perciò non prendetela troppo sul serio *(anche perché le stronzate siete capaci di farle e dirle anche senza impegno)*. Si gioca singolarmente, prcioò la tua squadra sei solo tu. La sconfitta, o la vittoria, dipenderà solo da te.
+    L'obiettivo principale è divertirsi, perciò non prendetela troppo sul serio *(anche perché le stronzate siete capaci di farle e dirle anche senza impegno)*. Si gioca singolarmente, perciò la tua squadra sei solo tu. La sconfitta, o la vittoria, dipenderà solo da te.
 
     📸 **L'Onere della Prova:**
-    Ogni Bonus e Malus deve essere dimostrato. Sono considerate prove valide: foto, video, screenshot, registrazioni vocali o la conferma di almeno 2 testimoni oculari. Le testimonianze possono ovviamente essere escluse o non ritenute valide in casi particolari (👀) *(non vogliamo una denuncia per registrazione di contenuti vietati ai minori di 18)*.
+    Ogni Bonus e Malus deve essere dimostrato. Sono considerate prove valide: foto, video, screenshot, registrazioni vocali o la conferma di almeno 2 testimoni oculari.
 
     ⚖️ **L'Eccezione del Triumvirato:**
     Per Jacopo, Riccardo e Pippo, 2 testimoni oculari non bastano. Ne devono aggiungere un terzo che sia al di fuori del triumvirato.
@@ -188,7 +191,7 @@ with tab2:
     A colui che non ha supportato la creazione del gioco (non mandando le proprie foto alla creatrice), spetta un Malus di partenza di **-5 punti**. Annullarlo è facile: basta fornire delle sentite scuse all'autrice e promettere solennemente di sostenere le sue future e brillanti creazioni.
     """)
 
-# --- TAB 3: BONUS E MALUS (Solo Tabelle) ---
+# --- TAB 3: BONUS E MALUS ---
 with tab3:
     st.header("Punteggi Ufficiali")
     df_regole = pd.DataFrame(list(regolamento.items()), columns=["Azione", "Punti"])
@@ -201,8 +204,7 @@ with tab3:
     st.write("🔴 **Malus**")
     st.dataframe(df_regole[df_regole["Punti"] < 0].sort_values(by="Punti", ascending=True), use_container_width=True, hide_index=True)
 
-# --- TAB 4: AGGIUNGI EVENTO ---
-# --- TAB 4: AGGIUNGI EVENTO ---
+# --- TAB 4: CABINA DI REGIA ---
 with tab4:
     st.header("Assegna Punteggio")
     
@@ -220,8 +222,7 @@ with tab4:
             
             if submit_button:
                 punti_assegnati = regolamento[azione_selezionata]
-        
-        # --- DA QUI IN POI TUTTO DEVE ESSERE SPOSTATO A DESTRA (INDENTATO) ---
+                
                 nuovo_dato = {
                     "Data": data_evento.strftime("%d/%m/%Y"),
                     "Persona": persona_selezionata,
@@ -229,7 +230,7 @@ with tab4:
                     "Punti": punti_assegnati
                 }
         
-                url_script = "https://script.google.com/macros/s/AKfycbzD1n1ZqAJaknD2IOXfPJPDXkDlTuAf9guoe1X9WSRi5CfFEPKS8UDutcoP9--K_1Fp/exec"
+                url_script = "https://script.google.com/macros/s/AKfycbylsTZQn9yVirYFqUebj-36xkMC9UTo4P4T6erO697SF48psqPDEbhCQ4zJ54hhRL44rw/exec"
         
                 try:
                     risposta = requests.post(url_script, json=nuovo_dato)
@@ -239,9 +240,8 @@ with tab4:
                             "Persona": [persona_selezionata],
                             "Azione": [azione_selezionata],
                             "Punti": [punti_assegnati]
-                            })
+                        })
                         st.session_state.eventi = pd.concat([st.session_state.eventi, nuovo_evento_df], ignore_index=True)
-                        
                         st.success(f"Aggiunto e salvato sul Cloud! {persona_selezionata} ha preso {punti_assegnati} punti.")
                     else:
                         st.warning("C'è stato un problema nel salvataggio sul cloud.")
@@ -250,35 +250,25 @@ with tab4:
             
                 st.rerun()
         
-        # --- NUOVA SEZIONE: ELIMINA EVENTO ---
-        st.divider() # Linea di separazione visiva
+        # --- SEZIONE: ELIMINA EVENTO ---
+        st.divider() 
         st.subheader("🗑️ Elimina un inserimento sbagliato")
         
-        # Controlliamo se ci sono eventi da poter cancellare
         if not st.session_state.eventi.empty:
-            
-            # Creiamo una lista leggibile con tutti gli eventi inseriti finora
             lista_eventi = []
             for indice, riga in st.session_state.eventi.iterrows():
                 descrizione = f"{indice} - {riga['Data']} | {riga['Persona']} | {riga['Azione']} ({riga['Punti']} pt)"
                 lista_eventi.append(descrizione)
                 
-            # Menu a tendina per scegliere quale evento cancellare
             evento_scelto = st.selectbox("Seleziona l'evento da cancellare:", lista_eventi)
             
-            # Tasto per eliminare
             if st.button("❌ Conferma Eliminazione", use_container_width=True):
-                # Estraiamo il numero (l'indice) per capire quale riga eliminare dalla tabella
                 indice_reale = int(evento_scelto.split(" - ")[0])
                 st.session_state.eventi = st.session_state.eventi.drop(indice_reale).reset_index(drop=True)
-                
                 st.success("Evento cancellato con successo! La classifica è stata ricalcolata.")
-                st.rerun() # Ricarica l'app per mostrare la classifica aggiornata
+                st.rerun() 
         else:
             st.info("Nessun evento registrato finora.")
             
-    elif password != "":
-        st.error("Password errata. Non sei degno di assegnare punti! 🛑")
-    
     elif password != "":
         st.error("Password errata. Non sei degno di assegnare punti! 🛑")
