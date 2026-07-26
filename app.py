@@ -12,7 +12,7 @@ import os # Ci serve per dire al programma di cercare i file delle foto
 import requests
 
 # Link per leggere i dati dal Foglio Google
-url_foglio = "https://docs.google.com/spreadsheets/d/1OM4wMHXeal2kTsORf6GhZCsKHP-cfJJ1zdQFWdu1Kpg/export?format=csv"
+url_foglio = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS-DeqH_4J8v8Tx74q4i5FIlHbkJbf1Lu3HaHRoEswTlFs7r56B-L0d3TvP1xTWbXKMMR5INSqr2k26/pub?output=csv"
 
 try:
     st.session_state.eventi = pd.read_csv(url_foglio)
