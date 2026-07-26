@@ -221,26 +221,26 @@ with tab4:
             if submit_button:
                 punti_assegnati = regolamento[azione_selezionata]
         
+        # --- DA QUI IN POI TUTTO DEVE ESSERE SPOSTATO A DESTRA (INDENTATO) ---
             nuovo_dato = {
-            "Data": data_evento.strftime("%d/%m/%Y"),
-            "Persona": persona_selezionata,
-            "Azione": azione_selezionata,
-            "Punti": punti_assegnati
-        }
+                "Data": data_evento.strftime("%d/%m/%Y"),
+                "Persona": persona_selezionata,
+                "Azione": azione_selezionata,
+                "Punti": punti_assegnati
+                }
         
-        # Metti qui tra le virgolette il link che finisce con /exec della tua Web App di Apps Script
-        url_script = "INCOLLA_QUI_IL_LINK_DELLA_WEB_APP"
+            url_script = "INCOLLA_QUI_IL_LINK_DELLA_WEB_APP"
         
-        try:
-            risposta = requests.post(url_script, json=nuovo_dato)
-            if risposta.status_code == 200:
-                st.success(f"Aggiunto e salvato sul Cloud! {persona_selezionata} ha preso {punti_assegnati} punti.")
-            else:
-                st.warning("C'è stato un problema nel salvataggio sul cloud.")
-        except Exception as e:
-            st.error(f"Errore di connessione: {e}")
+            try:
+                risposta = requests.post(url_script, json=nuovo_dato)
+                if risposta.status_code == 200:
+                    st.success(f"Aggiunto e salvato sul Cloud! {persona_selezionata} ha preso {punti_assegnati} punti.")
+                else:
+                    st.warning("C'è stato un problema nel salvataggio sul cloud.")
+            except Exception as e:
+                st.error(f"Errore di connessione: {e}")
             
-        st.rerun()
+            st.rerun()
         
         # --- NUOVA SEZIONE: ELIMINA EVENTO ---
         st.divider() # Linea di separazione visiva
