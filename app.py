@@ -12,7 +12,7 @@ import os # Ci serve per dire al programma di cercare i file delle foto
 import requests
 
 # Link per leggere i dati dal Foglio Google
-url_foglio = "https://docs.google.com/spreadsheets/d/ID_DEL_TUO_FOGLIO/export?format=csv"
+url_foglio = "https://docs.google.com/spreadsheets/d/1OM4wMHXeal2kTsORf6GhZCsKHP-cfJJ1zdQFWdu1Kpg/export?format=csv"
 
 try:
     st.session_state.eventi = pd.read_csv(url_foglio)
@@ -229,7 +229,7 @@ with tab4:
                     "Punti": punti_assegnati
                     }
         
-                url_script = "INCOLLA_QUI_IL_LINK_DELLA_WEB_APP"
+                url_script = "https://script.google.com/macros/s/AKfycbxLvD8XiFrv737eR_YSJRpE7LZvDfVlRn5mg6zuNCnbQS66oEGdEFM30weXqP7uVJ2Z/exec"
         
                 try:
                     risposta = requests.post(url_script, json=nuovo_dato)
