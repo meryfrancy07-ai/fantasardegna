@@ -229,7 +229,7 @@ with tab4:
                     "Punti": punti_assegnati
                 }
         
-                url_script = "https://script.google.com/macros/s/AKfycbyHIODwjcW3IqSJS62n9uTBc3WasOoYwlhBMQYtOWJXkjQGHZPvNuxxmjKQTIpVKqiAIw/exec"
+                url_script = "https://script.google.com/macros/s/AKfycbzD1n1ZqAJaknD2IOXfPJPDXkDlTuAf9guoe1X9WSRi5CfFEPKS8UDutcoP9--K_1Fp/exec"
         
                 try:
                     risposta = requests.post(url_script, json=nuovo_dato)
