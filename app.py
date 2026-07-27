@@ -196,7 +196,7 @@ with tab2:
     Le finte proposte e le finte litigate sono valide ai fini del punteggio SOLO se riescono ad attirare l'attenzione di almeno 5 passanti.
 
     🍹 **Regola sui drink:**
-    Il bonus inerente ai drink bevuti verra contato solo dal secondo drink in poi (secondo escluso) per le donne, dal terzo in poi (terzo escluso) per gli uomini
+    Il bonus inerente ai drink bevuti verra contato solo dal secondo drink in poi (secondo escluso) per le donne, dal terzo in poi (terzo escluso) per gli uomini.
     """)
     
     st.error("""
