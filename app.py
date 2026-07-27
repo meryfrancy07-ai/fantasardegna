@@ -231,7 +231,7 @@ with tab4:
 
             tipo_evento = st.radio("Che tipo di azione vuoi inserire?", 
                                    ["📚 Da Regolamento (Usa la tendina)", "✍️ Evento Personalizzato (Scrivi tu)"])
-           st.markdown("---")
+            st.markdown("---")
             
             # Campi per l'evento standard
             azione_standard = st.selectbox("Azione da Regolamento:", list(regolamento.keys()))
