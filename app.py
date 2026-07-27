@@ -259,6 +259,7 @@ with tab4:
                         "Persona": persona_selezionata,
                         "Azione": azione_definitiva,
                         "Punti": punti_assegnati       
+                    }
                 
                 url_script = "https://script.google.com/macros/s/AKfycbylsTZQn9yVirYFqUebj-36xkMC9UTo4P4T6erO697SF48psqPDEbhCQ4zJ54hhRL44rw/exec"
         
