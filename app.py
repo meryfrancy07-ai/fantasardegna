@@ -228,31 +228,28 @@ with tab4:
             persona_selezionata = st.selectbox("Chi ha fatto l'azione?", personaggi)
 
             st.divider()
-
+            
+            # --- NUOVA SEZIONE: TIPO DI EVENTO (DINAMICA) ---
             tipo_evento = st.radio("Che tipo di azione vuoi inserire?", 
                                    ["📚 Da Regolamento (Usa la tendina)", "✍️ Evento Personalizzato (Scrivi tu)"])
+            
             st.markdown("---")
             
-            # Campi per l'evento standard
-            azione_standard = st.selectbox("Azione da Regolamento:", list(regolamento.keys()))
-            
-            # Campi per l'evento personalizzato
-            azione_custom = st.text_input("📝 Motivo personalizzato (ignoralo se usi il regolamento):")
-            punti_custom = st.number_input("🔢 Punti personalizzati (Metti il segno - per togliere punti):", value=0, step=1)
+            # Mostra i campi giusti in base alla scelta del pallino
+            if tipo_evento == "📚 Da Regolamento (Usa la tendina)":
+                azione_definitiva = st.selectbox("Azione da Regolamento:", list(regolamento.keys()))
+                punti_assegnati = regolamento[azione_definitiva]
+                st.info(f"💡 Punti calcolati in automatico: {punti_assegnati}")
+                
+            else:
+                azione_definitiva = st.text_input("📝 Scrivi il motivo dell'evento:")
+                punti_assegnati = st.number_input("🔢 Scegli i punti (Usa il tasto - per togliere punti):", value=0, step=1)
             
             st.divider()
             
             submit_button = st.form_submit_button("➕ Salva Evento", use_container_width=True)
             
             if submit_button:
-                # La logica che sceglie quali dati usare in base al pallino selezionato
-                if tipo_evento == "📚 Da Regolamento (Usa la tendina)":
-                    azione_definitiva = azione_standard
-                    punti_assegnati = regolamento[azione_standard]
-                else:
-                    azione_definitiva = azione_custom
-                    punti_assegnati = punti_custom
-                
                 # Controllo anti-errore: se scegli "Personalizzato" ma lasci vuoto il testo
                 if tipo_evento == "✍️ Evento Personalizzato (Scrivi tu)" and str(azione_definitiva).strip() == "":
                     st.warning("⚠️ Devi scrivere un motivo per l'evento personalizzato!")
@@ -261,9 +258,7 @@ with tab4:
                         "Data": data_evento.strftime("%d/%m/%Y"),
                         "Persona": persona_selezionata,
                         "Azione": azione_definitiva,
-                        "Punti": punti_assegnati
-                    }
-        
+                        "Punti": punti_assegnati       
                 
                 url_script = "https://script.google.com/macros/s/AKfycbylsTZQn9yVirYFqUebj-36xkMC9UTo4P4T6erO697SF48psqPDEbhCQ4zJ54hhRL44rw/exec"
         
