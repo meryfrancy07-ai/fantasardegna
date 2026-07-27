@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Jul 26 20:40:43 2026
+Created on Mon Jul 27 08:46:40 2026
 
 @author: maria
 """
@@ -17,14 +17,19 @@ import pandas as pd
 from datetime import datetime
 import os 
 import requests
+import time # IMPORTANTE: Ci serve per ingannare la memoria cache di Google
 
 # Link diretto per leggere i dati dal Foglio Google (senza ritardi di cache)
 url_foglio = "https://docs.google.com/spreadsheets/d/1OM4wMHXeal2kTsORf6GhZCsKHP-cfJJ1zdQFWdu1Kpg/export?format=csv"
 
-try:
-    st.session_state.eventi = pd.read_csv(url_foglio)
-except:
-    if 'eventi' not in st.session_state:
+# --- CARICAMENTO DATI INTELLIGENTE ---
+# L'app legge i dati da Google SOLO la prima volta che apri la pagina o quando serve
+if 'eventi' not in st.session_state:
+    try:
+        # Aggiungiamo il tempo attuale al link per costringere Google a darci i dati freschi
+        url_fresco = f"{url_foglio}&t={time.time()}"
+        st.session_state.eventi = pd.read_csv(url_fresco)
+    except:
         st.session_state.eventi = pd.DataFrame(columns=["Data", "Persona", "Azione", "Punti"])
         
 # --- CONFIGURAZIONE PAGINA E STILE ---
@@ -38,10 +43,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.title("🌊 Fantasardegna 2026")
-
-# --- INIZIALIZZAZIONE DATI ---
-if 'eventi' not in st.session_state:
-    st.session_state.eventi = pd.DataFrame(columns=["Data", "Persona", "Azione", "Punti"])
 
 personaggi = [
     "Angelo", "Daniele", "Fabio", "Marta", "Matteo", "Mawi", 
@@ -167,11 +168,12 @@ with tab1:
 # --- TAB 2: REGOLAMENTO ---
 with tab2:
     st.header("Le Regole del Gioco")
+    
     st.markdown("""
     L'obiettivo principale è divertirsi, perciò non prendetela troppo sul serio *(anche perché le stronzate siete capaci di farle e dirle anche senza impegno)*. Si gioca singolarmente, perciò la tua squadra sei solo tu. La sconfitta, o la vittoria, dipenderà solo da te.
 
     📸 **L'Onere della Prova:**
-    Ogni Bonus e Malus deve essere dimostrato. Sono considerate prove valide: foto, video, screenshot, registrazioni vocali o la conferma di almeno 2 testimoni oculari.
+    Ogni Bonus e Malus deve essere dimostrato. Sono considerate prove valide: foto, video, screenshot, registrazioni vocali o la conferma di almeno 2 testimoni oculari. Le testimonianze possono ovviamente essere escluse o non ritenute valide in casi particolari (👀) *(non vogliamo una denuncia per registrazione di contenuti vietati ai minori di 18)*.
 
     ⚖️ **L'Eccezione del Triumvirato:**
     Per Jacopo, Riccardo e Pippo, 2 testimoni oculari non bastano. Ne devono aggiungere un terzo che sia al di fuori del triumvirato.
@@ -230,29 +232,35 @@ with tab4:
                     "Punti": punti_assegnati
                 }
         
-                url_script ="https://script.google.com/macros/s/AKfycbylSTZQ9yVirYFQuebj-36xkMC9Uto4P4T6er0697SF48psqPDEbhCQ4zJ54hhRL44rw/exec"
+                url_script = "https://script.google.com/macros/s/AKfycbylSTZQ9yVirYFQuebj-36xkMC9Uto4P4T6er0697SF48psqPDEbhCQ4zJ54hhRL44rw/exec"
         
                 try:
                     risposta = requests.post(url_script, json=nuovo_dato)
-                    if risposta.status_code == 200:
-                        nuovo_evento_df = pd.DataFrame({
-                            "Data": [data_evento.strftime("%d/%m/%Y")],
-                            "Persona": [persona_selezionata],
-                            "Azione": [azione_selezionata],
-                            "Punti": [punti_assegnati]
-                        })
-                        st.session_state.eventi = pd.concat([st.session_state.eventi, nuovo_evento_df], ignore_index=True)
-                        st.success(f"Aggiunto e salvato sul Cloud! {persona_selezionata} ha preso {punti_assegnati} punti.")
-                    else:
-                        st.warning("C'è stato un problema nel salvataggio sul cloud.")
+                    
+                    # --- IL NOSTRO CACCIATORE DI ERRORI ---
+                    try:
+                        esito = risposta.json()
+                        if esito.get("status") == "success":
+                            nuovo_evento_df = pd.DataFrame({
+                                "Data": [data_evento.strftime("%d/%m/%Y")],
+                                "Persona": [persona_selezionata],
+                                "Azione": [azione_selezionata],
+                                "Punti": [punti_assegnati]
+                            })
+                            st.session_state.eventi = pd.concat([st.session_state.eventi, nuovo_evento_df], ignore_index=True)
+                            st.success(f"Aggiunto e salvato sul Cloud! {persona_selezionata} ha preso {punti_assegnati} punti.")
+                            time.sleep(1.5) # Diamo il tempo a Streamlit di mostrare il messaggio verde prima di ricaricare
+                            st.rerun()
+                        else:
+                            st.error(f"❌ Google ha bloccato il salvataggio. Errore: {esito.get('message')}")
+                    except:
+                        st.error("❌ Errore fatale: Google non fa entrare l'app. Ricontrolla i permessi di Google Apps Script (Chi ha accesso: Chiunque).")
                 except Exception as e:
                     st.error(f"Errore di connessione: {e}")
-            
-                st.rerun()
         
         # --- SEZIONE: ELIMINA EVENTO ---
         st.divider() 
-        st.subheader("🗑️ Elimina un inserimento sbagliato")
+        st.subheader("🗑️ Elimina un inserimento sbagliato (Solo Locale)")
         
         if not st.session_state.eventi.empty:
             lista_eventi = []
@@ -265,7 +273,8 @@ with tab4:
             if st.button("❌ Conferma Eliminazione", use_container_width=True):
                 indice_reale = int(evento_scelto.split(" - ")[0])
                 st.session_state.eventi = st.session_state.eventi.drop(indice_reale).reset_index(drop=True)
-                st.success("Evento cancellato con successo! La classifica è stata ricalcolata.")
+                st.success("Evento cancellato con successo! (Ricorda di cancellarlo anche dal Foglio Google se era stato salvato).")
+                time.sleep(1.5)
                 st.rerun() 
         else:
             st.info("Nessun evento registrato finora.")
