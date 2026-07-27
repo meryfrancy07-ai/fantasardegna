@@ -218,6 +218,7 @@ with tab3:
     st.dataframe(df_regole[df_regole["Punti"] < 0].sort_values(by="Punti", ascending=True), use_container_width=True, hide_index=True)
 
 # --- TAB 4: CABINA DI REGIA ---
+# --- TAB 4: CABINA DI REGIA ---
 with tab4:
     st.header("Assegna Punteggio")
     
@@ -226,19 +227,22 @@ with tab4:
     if password == "sardegna2026":
         st.success("Accesso sbloccato! Sei pronta a giudicare.")
         
+        st.divider()
+        
+        # --- LA SCELTA ORA È FUORI DAL FORM COSÌ SI AGGIORNA SUBITO! ---
+        tipo_evento = st.radio("Che tipo di azione vuoi inserire?", 
+                               ["📚 Da Regolamento (Usa la tendina)", "✍️ Evento Personalizzato (Scrivi tu)"])
+        
+        st.markdown("---")
+        
+        # --- INIZIO DEL MODULO DI SALVATAGGIO ---
         with st.form("form_eventi", clear_on_submit=True):
             data_evento = st.date_input("Data", datetime.today())
             persona_selezionata = st.selectbox("Chi ha fatto l'azione?", personaggi)
             
             st.divider()
             
-            # --- NUOVA SEZIONE: TIPO DI EVENTO (DINAMICA) ---
-            tipo_evento = st.radio("Che tipo di azione vuoi inserire?", 
-                                   ["📚 Da Regolamento (Usa la tendina)", "✍️ Evento Personalizzato (Scrivi tu)"])
-            
-            st.markdown("---")
-            
-            # Mostra i campi giusti in base alla scelta del pallino
+            # Mostra i campi giusti in base alla scelta del pallino (che ora funziona in tempo reale)
             if tipo_evento == "📚 Da Regolamento (Usa la tendina)":
                 azione_definitiva = st.selectbox("Azione da Regolamento:", list(regolamento.keys()))
                 punti_assegnati = regolamento[azione_definitiva]
@@ -264,8 +268,8 @@ with tab4:
                         "Punti": punti_assegnati
                     }
                     
-                    # 🚨 RICORDATI DI INCOLLARE QUI IL TUO LINK DI GOOGLE APPS SCRIPT! 🚨
-                    url_script = "https://script.google.com/macros/s/AKfycbylsTZQn9yVirYFqUebj-36xkMC9UTo4P4T6erO697SF48psqPDEbhCQ4zJ54hhRL44rw/exec"
+                    # 🚨 RICORDATI DI INCOLLARE QUI IL TUO VERO LINK DI GOOGLE APPS SCRIPT! 🚨
+                    url_script = "INCOLLA_QUI_IL_NUOVO_LINK_DI_APPS_SCRIPT"
             
                     try:
                         risposta = requests.post(url_script, json=nuovo_dato)
@@ -278,7 +282,7 @@ with tab4:
                             nuovo_evento_df = pd.DataFrame({
                                 "Data": [data_evento.strftime("%d/%m/%Y")],
                                 "Persona": [persona_selezionata],
-                                "Azione": [azione_definitiva], # Ora usa il nome nuovo corretto!
+                                "Azione": [azione_definitiva],
                                 "Punti": [punti_assegnati]
                             })
                             st.session_state.eventi = pd.concat([st.session_state.eventi, nuovo_evento_df], ignore_index=True)
@@ -293,7 +297,6 @@ with tab4:
         # --- SEZIONE: ELIMINA EVENTO ---
         st.divider() 
         st.subheader("🗑️ Elimina un inserimento sbagliato (Solo Locale)")
-        
         if not st.session_state.eventi.empty:
             lista_eventi = []
             for indice, riga in st.session_state.eventi.iterrows():
