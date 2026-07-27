@@ -20,7 +20,7 @@ import requests
 import time # IMPORTANTE: Ci serve per ingannare la memoria cache di Google
 
 # Link diretto per leggere i dati dal Foglio Google (senza ritardi di cache)
-url_foglio = "https://docs.google.com/spreadsheets/d/1OM4wMHXeal2kTsORf6GhZCsKHP-cfJJ1zdQFWdu1Kpg/export?format=csv"
+url_foglio = "https://docs.google.com/spreadsheets/d/1OM4wMHXeaL2kTsORf6GhZCsKHP-cfJJ1zdQFWdu1Kpg/export?format=csv"
 
 # --- CARICAMENTO DATI INTELLIGENTE ---
 # L'app legge i dati da Google SOLO la prima volta che apri la pagina o quando serve
