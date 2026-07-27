@@ -223,10 +223,10 @@ with tab4:
     if password == "sardegna2026":
         st.success("Accesso sbloccato! Sei pronta a giudicare.")
         
-        with st.form("form_eventi", clear_on_submit=True):
+       with st.form("form_eventi", clear_on_submit=True):
             data_evento = st.date_input("Data", datetime.today())
             persona_selezionata = st.selectbox("Chi ha fatto l'azione?", personaggi)
-
+            
             st.divider()
             
             # --- NUOVA SEZIONE: TIPO DI EVENTO (DINAMICA) ---
@@ -258,34 +258,34 @@ with tab4:
                         "Data": data_evento.strftime("%d/%m/%Y"),
                         "Persona": persona_selezionata,
                         "Azione": azione_definitiva,
-                        "Punti": punti_assegnati       
+                        "Punti": punti_assegnati
                     }
-                
-                url_script = "https://script.google.com/macros/s/AKfycbylsTZQn9yVirYFqUebj-36xkMC9UTo4P4T6erO697SF48psqPDEbhCQ4zJ54hhRL44rw/exec"
-        
-                try:
-                    risposta = requests.post(url_script, json=nuovo_dato)
                     
+                    # 🚨 RICORDATI DI INCOLLARE QUI IL TUO LINK DI GOOGLE APPS SCRIPT! 🚨
+                    url_script = "INCOLLA_QUI_IL_NUOVO_LINK_DI_APPS_SCRIPT"
+            
                     try:
-                        esito = risposta.json()
-                    except:
-                        esito = {"status": "error", "message": "Impossibile leggere la risposta di Google"}
-                        
-                    if esito.get("status") == "success":
-                        nuovo_evento_df = pd.DataFrame({
-                            "Data": [data_evento.strftime("%d/%m/%Y")],
-                            "Persona": [persona_selezionata],
-                            "Azione": [azione_selezionata],
-                            "Punti": [punti_assegnati]
-                        })
-                        st.session_state.eventi = pd.concat([st.session_state.eventi, nuovo_evento_df], ignore_index=True)
-                        st.success(f"Aggiunto e salvato sul Cloud! {persona_selezionata} ha preso {punti_assegnati} punti.")
-                        time.sleep(1.5)
-                        st.rerun() # Il riavvio è stato spostato qui fuori pericolo!
-                    else:
-                        st.error(f"❌ Google ha bloccato il salvataggio. Errore: {esito.get('message')}")
-                except Exception as e:
-                    st.error(f"Errore di connessione: {e}")
+                        risposta = requests.post(url_script, json=nuovo_dato)
+                        try:
+                            esito = risposta.json()
+                        except:
+                            esito = {"status": "error", "message": "Impossibile leggere la risposta di Google"}
+                            
+                        if esito.get("status") == "success":
+                            nuovo_evento_df = pd.DataFrame({
+                                "Data": [data_evento.strftime("%d/%m/%Y")],
+                                "Persona": [persona_selezionata],
+                                "Azione": [azione_definitiva], # Ora usa il nome nuovo corretto!
+                                "Punti": [punti_assegnati]
+                            })
+                            st.session_state.eventi = pd.concat([st.session_state.eventi, nuovo_evento_df], ignore_index=True)
+                            st.success(f"Aggiunto e salvato sul Cloud! {persona_selezionata} ha preso {punti_assegnati} punti.")
+                            time.sleep(1.5)
+                            st.rerun() 
+                        else:
+                            st.error(f"❌ Google ha bloccato il salvataggio. Errore: {esito.get('message')}")
+                    except Exception as e:
+                        st.error(f"Errore di connessione: {e}")
         
         # --- SEZIONE: ELIMINA EVENTO ---
         st.divider() 
