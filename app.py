@@ -12,6 +12,7 @@ Created on Sun Jul 26 17:21:10 2026
 @author: maria
 """
 
+# -*- coding: utf-8 -*-
 import streamlit as st
 import pandas as pd
 from datetime import datetime
@@ -19,7 +20,7 @@ import os
 import requests
 import time # IMPORTANTE: Ci serve per ingannare la memoria cache di Google
 
-# Link diretto per leggere i dati dal Foglio Google (senza ritardi di cache)
+# Link diretto per leggere i dati dal Foglio Google (con la L MAIUSCOLA corretta!)
 url_foglio = "https://docs.google.com/spreadsheets/d/1OM4wMHXeaL2kTsORf6GhZCsKHP-cfJJ1zdQFWdu1Kpg/export?format=csv"
 
 # --- CARICAMENTO DATI INTELLIGENTE ---
@@ -119,7 +120,7 @@ with tab1:
     
     for index, row in st.session_state.eventi.iterrows():
         if row["Persona"] in punteggi_totali:
-            punteggi_totali[row["Persona"]] += row["Punti"]
+            punteggi_totali[row["Persona"]] += int(row["Punti"])
             
     df_classifica = pd.DataFrame(list(punteggi_totali.items()), columns=["Persona", "Punti Totali"])
     df_classifica = df_classifica.sort_values(by="Punti Totali", ascending=False).reset_index(drop=True)
@@ -232,29 +233,30 @@ with tab4:
                     "Punti": punti_assegnati
                 }
         
+                # 🚨 SOSTITUISCI IL LINK QUI SOTTO TRA LE VIRGOLETTE CON IL TUO NUOVO LINK DI APPS SCRIPT 🚨
                 url_script = "https://script.google.com/macros/s/AKfycbylsTZQn9yVirYFqUebj-36xkMC9UTo4P4T6erO697SF48psqPDEbhCQ4zJ54hhRL44rw/exec"
         
                 try:
                     risposta = requests.post(url_script, json=nuovo_dato)
                     
-                    # --- IL NOSTRO CACCIATORE DI ERRORI ---
                     try:
                         esito = risposta.json()
-                        if esito.get("status") == "success":
-                            nuovo_evento_df = pd.DataFrame({
-                                "Data": [data_evento.strftime("%d/%m/%Y")],
-                                "Persona": [persona_selezionata],
-                                "Azione": [azione_selezionata],
-                                "Punti": [punti_assegnati]
-                            })
-                            st.session_state.eventi = pd.concat([st.session_state.eventi, nuovo_evento_df], ignore_index=True)
-                            st.success(f"Aggiunto e salvato sul Cloud! {persona_selezionata} ha preso {punti_assegnati} punti.")
-                            time.sleep(1.5) # Diamo il tempo a Streamlit di mostrare il messaggio verde prima di ricaricare
-                            st.rerun()
-                        else:
-                            st.error(f"❌ Google ha bloccato il salvataggio. Errore: {esito.get('message')}")
                     except:
-                        st.error("❌ Errore fatale: Google non fa entrare l'app. Ricontrolla i permessi di Google Apps Script (Chi ha accesso: Chiunque).")
+                        esito = {"status": "error", "message": "Impossibile leggere la risposta di Google"}
+                        
+                    if esito.get("status") == "success":
+                        nuovo_evento_df = pd.DataFrame({
+                            "Data": [data_evento.strftime("%d/%m/%Y")],
+                            "Persona": [persona_selezionata],
+                            "Azione": [azione_selezionata],
+                            "Punti": [punti_assegnati]
+                        })
+                        st.session_state.eventi = pd.concat([st.session_state.eventi, nuovo_evento_df], ignore_index=True)
+                        st.success(f"Aggiunto e salvato sul Cloud! {persona_selezionata} ha preso {punti_assegnati} punti.")
+                        time.sleep(1.5)
+                        st.rerun() # Il riavvio è stato spostato qui fuori pericolo!
+                    else:
+                        st.error(f"❌ Google ha bloccato il salvataggio. Errore: {esito.get('message')}")
                 except Exception as e:
                     st.error(f"Errore di connessione: {e}")
         
