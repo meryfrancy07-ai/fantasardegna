@@ -223,7 +223,7 @@ with tab4:
     if password == "sardegna2026":
         st.success("Accesso sbloccato! Sei pronta a giudicare.")
         
-       with st.form("form_eventi", clear_on_submit=True):
+        with st.form("form_eventi", clear_on_submit=True):
             data_evento = st.date_input("Data", datetime.today())
             persona_selezionata = st.selectbox("Chi ha fatto l'azione?", personaggi)
             
