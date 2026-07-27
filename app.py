@@ -88,7 +88,7 @@ regolamento = {
     "metà fontana di alcol" : 15,
     "stile": 5,
     "vittoria a un gioco di squadra" : 5,
-    "vittoria solitaria a un gioco" : 7
+    "vittoria solitaria a un gioco" : 7,
     
     # --- 🔴 MALUS ---
     "lamentela ingiustificata": -5,
