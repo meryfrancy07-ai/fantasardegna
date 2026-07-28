@@ -269,7 +269,7 @@ with tab4:
                     }
                     
                     # 🚨 RICORDATI DI INCOLLARE QUI IL TUO VERO LINK DI GOOGLE APPS SCRIPT! 🚨
-                    url_script = "INCOLLA_QUI_IL_NUOVO_LINK_DI_APPS_SCRIPT"
+                    url_script = "https://script.google.com/macros/s/AKfycbylsTZQn9yVirYFqUebj-36xkMC9UTo4P4T6erO697SF48psqPDEbhCQ4zJ54hhRL44rw/exec"
             
                     try:
                         risposta = requests.post(url_script, json=nuovo_dato)
