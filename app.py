@@ -91,6 +91,7 @@ regolamento = {
     "vittoria solitaria a un gioco" : 7,
     
     # --- 🔴 MALUS ---
+    "nominare il fantasardegna per compiere un bonus/malus":-20,
     "lamentela ingiustificata": -5,
     "l'ultimo che finisce di prepararsi": -5,
     "telefono scarico prima delle 2 di notte": -5,
