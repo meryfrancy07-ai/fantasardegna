@@ -52,7 +52,7 @@ personaggi = [
 
 regolamento = {
     # --- 🟢 BONUS ---
-    "guidare per le serate"
+    "guidare per le serate" : 5,
     "cucina per tutti": 5,
     "ogni drink bevuto": 5,
     "shot bevuto": 2,
