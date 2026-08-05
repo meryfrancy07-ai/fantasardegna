@@ -121,28 +121,61 @@ regolamento = {
 tab1, tab2, tab3, tab4 = st.tabs(["🏆 Classifica", "📜 Regolamento", "🟢🔴 Bonus & Malus", "⚙️ Cabina di Regia"])
 
 # --- TAB 1: CLASSIFICA E PROFILI ---
-with col1:
-    cartella_foto = "foto_giocatori"
-    foto_trovata = False
+# --- TAB 1: CLASSIFICA E PROFILI ---
+with tab1:
+    st.header("Classifica Generale")
+    
+    punteggi_totali = {p: 0 for p in personaggi}
+    punteggi_totali["Pippo"] = -5 # Malus iniziale Pippo
+    
+    for index, row in st.session_state.eventi.iterrows():
+        if row["Persona"] in punteggi_totali:
+            punteggi_totali[row["Persona"]] += int(row["Punti"])
+            
+    df_classifica = pd.DataFrame(list(punteggi_totali.items()), columns=["Persona", "Punti Totali"])
+    df_classifica = df_classifica.sort_values(by="Punti Totali", ascending=False).reset_index(drop=True)
+    st.dataframe(df_classifica, use_container_width=True, hide_index=True)
+    
+    st.divider()
+    st.subheader("🔍 Profili Giocatori")
+    st.write("Clicca sul nome di un giocatore per vedere i dettagli e le sue azioni!")
+    
+    for index, row in df_classifica.iterrows():
+        persona_corrente = row['Persona']
+        punti_correnti = row['Punti Totali']
+        
+        with st.expander(f"👤 {persona_corrente} - Punti: {punti_correnti}"):
+            col1, col2 = st.columns([1, 2])
+            
+            with col1:
+                cartella_foto = "foto_giocatori"
+                foto_trovata = False
+                if os.path.exists(cartella_foto):
+                    for file in os.listdir(cartella_foto):
+                        if file.split('.')[0].lower() == persona_corrente.lower():
+                            try:
+                                st.image(f"{cartella_foto}/{file}", use_container_width=True)
+                                foto_trovata = True
+                                break 
+                            except Exception:
+                                st.error(f"⚠️ Impossibile caricare la foto di {persona_corrente}. Il file potrebbe essere danneggiato o in un formato finto.")
+                                foto_trovata = True
+                                break
+                else:
+                    st.error("Non trovo la cartella 'foto_giocatori' accanto ad app.py!")
+                    foto_trovata = True 
                 
-    if os.path.exists(cartella_foto):
-        for file in os.listdir(cartella_foto):
-            if file.split('.')[0].lower() == persona_corrente.lower():
-                try:
-                                # use_container_width è il comando più aggiornato che non va in blocco
-                    st.image(f"{cartella_foto}/{file}", use_container_width=True)
-                    foto_trovata = True
-                    break 
-                except Exception:
-                    st.error(f"⚠️ Impossibile caricare la foto di {persona_corrente}. Il file potrebbe essere danneggiato o in un formato finto.")
-                    foto_trovata = True
-                    break
-            else:
-                st.error("Non trovo la cartella 'foto_giocatori' accanto ad app.py!")
-                foto_trovata = True 
-                
-            if not foto_trovata:
-                st.warning(f"Manca la foto di {persona_corrente}.")
+                if not foto_trovata:
+                    st.warning(f"Manca la foto di {persona_corrente}.")
+            
+            with col2:
+                st.write(f"**Punti Attuali:** {punti_correnti}")
+                eventi_personali = st.session_state.eventi[st.session_state.eventi['Persona'] == persona_corrente]
+                if not eventi_personali.empty:
+                    st.write("**Storico Azioni:**")
+                    st.dataframe(eventi_personali[['Data', 'Azione', 'Punti']], hide_index=True)
+                else:
+                    st.write("Nessuna azione registrata finora.")
 
 # --- TAB 2: REGOLAMENTO ---
 with tab2:
